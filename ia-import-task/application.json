@@ -1,0 +1,12 @@
+﻿{
+  /* TODO: Put your chatbot identifier and accessKey bellow. */
+  "identifier": "add-your-identifier-here",
+  "accessKey": "add-your-access-key-here",
+  "messageReceivers": [],
+  "settings": {
+    "intentionsFilePath": "add-your-intention-file-path-here",
+    "entitiesFilePath": "add-your-entities-file-path-here"
+  },
+  "settingsType": "Settings",
+  "startupType": "Startup"
+}
