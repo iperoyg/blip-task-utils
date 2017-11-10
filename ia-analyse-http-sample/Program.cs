@@ -17,14 +17,14 @@ namespace IAAnalyseHttpSample
 
         static void Main(string[] args)
         {
-            TypeUtil.RegisterDocument<AnalysisResponse>();
             MainAsync(args).GetAwaiter().GetResult();
         }
 
         static async Task MainAsync(string[] args)
         {
-            
-            using(var client = new BlipAnalysesHelper(AUTHORIZATION_KEY))
+            TypeUtil.RegisterDocument<AnalysisResponse>();
+
+            using (var client = new BlipAnalysesHelper(AUTHORIZATION_KEY))
             {
                 var text = "Some text to be analysed";
 
