@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bucket_import_task
+namespace BucketImportTask
 {
     public class BucketHelper : IBucketHelper, IDisposable
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace bucket_import_task
+namespace BucketImportTask
 {
     public enum BucketNamespace
     {

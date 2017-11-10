@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ia_import_task
+namespace IAImportTask
 {
     /// <summary>
     /// Define a simple settings file that can be injected to the receivers.

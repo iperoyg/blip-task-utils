@@ -1,7 +1,7 @@
 ﻿using System;
 using Take.Blip.Client.Console;
 
-namespace ia_import_task
+namespace IAImportTask
 {
     class Program
     {

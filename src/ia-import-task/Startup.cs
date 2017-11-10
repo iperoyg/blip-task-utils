@@ -8,7 +8,7 @@ using Take.Blip.Client;
 using Take.Blip.Client.Extensions.ArtificialIntelligence;
 using Takenet.Iris.Messaging.Resources.ArtificialIntelligence;
 
-namespace ia_import_task
+namespace IAImportTask
 {
     /// <summary>
     /// Defines a type that is called once during the application initialization.

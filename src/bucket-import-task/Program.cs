@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Takenet.Iris.Messaging.Resources.ArtificialIntelligence;
 
-namespace bucket_import_task
+namespace BucketImportTask
 {
     class Program
     {
