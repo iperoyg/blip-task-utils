@@ -24,15 +24,35 @@ namespace BucketImportTask
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Key", authorizationKey);
         }
 
-        public async Task AddAsync(string key, Document document)
+        public async Task AddAsync(string key, Document document, BucketNamespace bucketNamespace = BucketNamespace.Document)
         {
             try
             {
+                string @namespace;
+                switch (bucketNamespace)
+                {
+                    case BucketNamespace.Document:
+                        @namespace = "buckets";
+                        break;
+
+                    case BucketNamespace.Resource:
+                        @namespace = "resources";
+                        break;
+
+                    case BucketNamespace.Profile:
+                        @namespace = "profile";
+                        break;
+
+                    default:
+                        @namespace = "buckets";
+                        break;
+                }
+
                 var command = new Command
                 {
                     Id = EnvelopeId.NewId(),
                     To = Node.Parse("postmaster@msging.net"),
-                    Uri = new LimeUri($"/buckets/{key}"),
+                    Uri = new LimeUri($"/{@namespace}/{key}"),
                     Method = CommandMethod.Set,
                     Resource = document
                 };
@@ -69,7 +89,7 @@ namespace BucketImportTask
             switch (bucketNamespace)
             {
                 case BucketNamespace.Document:
-                    @namespace = "bucket";
+                    @namespace = "buckets";
                     break;
 
                 case BucketNamespace.Resource:
@@ -81,7 +101,7 @@ namespace BucketImportTask
                     break;
 
                 default:
-                    @namespace = "bucket";
+                    @namespace = "buckets";
                     break;
             }
 
@@ -118,19 +138,41 @@ namespace BucketImportTask
             }
         }
 
-        public async Task<IEnumerable<KeyValuePair<string, Document>>> GetAllDocumentsAsync(DocumentCollection keysCollection)
+        public async Task<IEnumerable<KeyValuePair<string, Document>>> GetAllDocumentsAsync(DocumentCollection keysCollection, BucketNamespace bucketNamespace)
         {
+            if (keysCollection.Total == 0) return null;
+
             try
             {
+                string @namespace;
+                switch (bucketNamespace)
+                {
+                    case BucketNamespace.Document:
+                        @namespace = "buckets";
+                        break;
+
+                    case BucketNamespace.Resource:
+                        @namespace = "resources";
+                        break;
+
+                    case BucketNamespace.Profile:
+                        @namespace = "profile";
+                        break;
+
+                    default:
+                        @namespace = "buckets";
+                        break;
+                }
+
                 var pairsCollection = new List<KeyValuePair<string, Document>>();
 
-                foreach (var key in keysCollection)
+                foreach (var key in keysCollection.Items)
                 {
                     var command = new Command
                     {
                         Id = EnvelopeId.NewId(),
                         To = Node.Parse("postmaster@msging.net"),
-                        Uri = new LimeUri($"/buckets/{key}"),
+                        Uri = new LimeUri($"/{@namespace}/{key}"),
                         Method = CommandMethod.Get
                     };
 
@@ -166,8 +208,8 @@ namespace BucketImportTask
     {
         Task<DocumentCollection> GetAllDocumentKeysAsync(BucketNamespace bucketNamespace);
 
-        Task<IEnumerable<KeyValuePair<string, Document>>> GetAllDocumentsAsync(DocumentCollection keysCollection);
+        Task<IEnumerable<KeyValuePair<string, Document>>> GetAllDocumentsAsync(DocumentCollection keysCollection, BucketNamespace bucketNamespace);
 
-        Task AddAsync(string key, Document document);
+        Task AddAsync(string key, Document document, BucketNamespace bucketNamespace);
     }
 }
