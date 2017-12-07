@@ -2,6 +2,7 @@
 using Lime.Protocol.Serialization;
 using Lime.Protocol.Serialization.Newtonsoft;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -104,6 +105,119 @@ namespace IAAnalyseHttpSample
                 return null;
             }
         }
+
+        public async Task<bool> TrainModel()
+        {
+            try
+            {
+                var command = new Command
+                {
+                    Id = EnvelopeId.NewId(),
+                    To = Node.Parse("postmaster@ai.msging.net"),
+                    Uri = new LimeUri("/models"),
+                    Method = CommandMethod.Set,
+                    Resource = new ModelTraining()
+                };
+
+                var envelopeSerializer = new JsonNetSerializer();
+                var commandString = envelopeSerializer.Serialize(command);
+
+                var httpContent = new StringContent(commandString, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _client.PostAsync("/commands", httpContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var envelopeResult = (Command)envelopeSerializer.Deserialize(responseBody);
+
+                return true;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return false;
+            }
+        }
+
+        public async Task<List<Model>> GetModels()
+        {
+            var modelList = new List<Model>();
+
+            try
+            {
+                var command = new Command
+                {
+                    Id = EnvelopeId.NewId(),
+                    To = Node.Parse("postmaster@ai.msging.net"),
+                    Uri = new LimeUri("/models"),
+                    Method = CommandMethod.Get,
+                };
+
+                var envelopeSerializer = new JsonNetSerializer();
+                var commandString = envelopeSerializer.Serialize(command);
+
+                var httpContent = new StringContent(commandString, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _client.PostAsync("/commands", httpContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var envelopeResult = (Command)envelopeSerializer.Deserialize(responseBody);
+                var modelCollection = envelopeResult.Resource as DocumentCollection;
+
+                foreach (var model in modelCollection)
+                {
+                    modelList.Add(model as Model);
+                }
+
+                return modelList;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return null;
+            }
+        }
+
+        public async Task<AnalysisResponse> PublishModel(string modelId)
+        {
+            try
+            {
+                var command = new Command
+                {
+                    Id = EnvelopeId.NewId(),
+                    To = Node.Parse("postmaster@ai.msging.net"),
+                    Uri = new LimeUri("/models"),
+                    Method = CommandMethod.Set,
+                    Resource = new ModelPublishing
+                    {
+                        Id = modelId
+                    }
+                };
+
+                var envelopeSerializer = new JsonNetSerializer();
+                var commandString = envelopeSerializer.Serialize(command);
+
+                var httpContent = new StringContent(commandString, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _client.PostAsync("/commands", httpContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var envelopeResult = (Command)envelopeSerializer.Deserialize(responseBody);
+
+                return envelopeResult.Resource as AnalysisResponse;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return null;
+            }
+        }
+
 
         public void Dispose()
         {

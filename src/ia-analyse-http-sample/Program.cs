@@ -17,15 +17,37 @@ namespace IAAnalyseHttpSample
 
         static void Main(string[] args)
         {
+            TypeUtil.RegisterDocument<AnalysisResponse>();
             MainAsync(args).GetAwaiter().GetResult();
         }
 
         static async Task MainAsync(string[] args)
         {
-            TypeUtil.RegisterDocument<AnalysisResponse>();
-
             using (var client = new BlipAnalysesHelper(AUTHORIZATION_KEY))
             {
+
+                // ***************************
+                // Step 1: Preparing the model
+                // ***************************
+
+                //Train created model
+                await client.TrainModel();
+
+                //Get created models Id
+                var models = await client.GetModels();
+
+                //Get correct model id, for example:
+                // NOTE: Pay attention if you are getting nearsty model
+                var modelId = models[0].Id;
+
+                //Publish some model
+                var result = await client.PublishModel(modelId);
+
+
+                // **********************
+                // Step 2: Analysing text
+                // **********************
+
                 var text = "Some text to be analysed";
 
                 //Analyse a text (with text record)
