@@ -13,7 +13,7 @@ namespace IAAnalyseHttpSample
     public class Program
     {
         //Add your chatbot authorization key (For instance: asldkhgaslhdgaljhsdgaljhsgd==)
-        private const string AUTHORIZATION_KEY = "dGVzdGV3ZWJob29raGFuZ291dHM6S0tqNm93RWJiTUFvSDExbVdCdUM=";
+        private const string AUTHORIZATION_KEY = "asldkhgaslhdgaljhsdgaljhsgd==";
 
         static void Main(string[] args)
         {
