@@ -13,11 +13,13 @@ namespace IAAnalyseHttpSample
     public class Program
     {
         //Add your chatbot authorization key (For instance: asldkhgaslhdgaljhsdgaljhsgd==)
-        private const string AUTHORIZATION_KEY = "your-authorization-key";
+        private const string AUTHORIZATION_KEY = "dGVzdGV3ZWJob29raGFuZ291dHM6S0tqNm93RWJiTUFvSDExbVdCdUM=";
 
         static void Main(string[] args)
         {
             TypeUtil.RegisterDocument<AnalysisResponse>();
+            TypeUtil.RegisterDocument<Intention>();
+            TypeUtil.RegisterDocument<Entity>();
             MainAsync(args).GetAwaiter().GetResult();
         }
 
@@ -29,6 +31,16 @@ namespace IAAnalyseHttpSample
                 // ***************************
                 // Step 1: Preparing the model
                 // ***************************
+
+                //Create an intent
+                var intentId = await client.AddIntent("abacate");
+
+                //Add questions for the created intent
+                var sampleQuestions = new Question[] { new Question { Text = "Quer comer abacate ?" } };
+                await client.AddQuestions(intentId, sampleQuestions);
+
+                //Delete some intent
+                await client.DeleteIntent(intentId);
 
                 //Train created model
                 await client.TrainModel();

@@ -218,6 +218,105 @@ namespace IAAnalyseHttpSample
             }
         }
 
+        public async Task DeleteIntent(string intentId)
+        {
+            try
+            {
+                var command = new Command
+                {
+                    Id = EnvelopeId.NewId(),
+                    To = Node.Parse("postmaster@ai.msging.net"),
+                    Uri = new LimeUri($"/intentions/{intentId}"),
+                    Method = CommandMethod.Delete,
+                };
+
+                var envelopeSerializer = new JsonNetSerializer();
+                var commandString = envelopeSerializer.Serialize(command);
+
+                var httpContent = new StringContent(commandString, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _client.PostAsync("/commands", httpContent);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+            }
+        }
+
+        public async Task<string> AddIntent(string intentName)
+        {
+            try
+            {
+                var command = new Command
+                {
+                    Id = EnvelopeId.NewId(),
+                    To = Node.Parse("postmaster@ai.msging.net"),
+                    Uri = new LimeUri("/intentions"),
+                    Method = CommandMethod.Set,
+                    Resource = new Intention
+                    {
+                        Name = intentName,
+                    }
+                };
+
+                var envelopeSerializer = new JsonNetSerializer();
+                var commandString = envelopeSerializer.Serialize(command);
+
+                var httpContent = new StringContent(commandString, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _client.PostAsync("/commands", httpContent);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var envelopeResult = (Command)envelopeSerializer.Deserialize(responseBody);
+                var createdIntention = envelopeResult.Resource as Intention;
+
+                return createdIntention.Id;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return null;
+            }
+        }
+
+        public async Task AddQuestions(string intentId, Question[] questions)
+        {
+            if (questions == null) throw new ArgumentNullException(nameof(questions));
+
+            try
+            {
+                var command = new Command
+                {
+                    Id = EnvelopeId.NewId(),
+                    To = Node.Parse("postmaster@ai.msging.net"),
+                    Uri = new LimeUri($"/intentions/{intentId}/questions"),
+                    Method = CommandMethod.Set,
+                    Resource = new DocumentCollection
+                    {
+                        ItemType = Question.MediaType,
+                        Items = questions
+                    }
+                };
+
+                var envelopeSerializer = new JsonNetSerializer();
+                var commandString = envelopeSerializer.Serialize(command);
+
+                var httpContent = new StringContent(commandString, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _client.PostAsync("/commands", httpContent);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+            }
+        }
+
 
         public void Dispose()
         {
@@ -228,7 +327,12 @@ namespace IAAnalyseHttpSample
     public interface IBlipAnalysesHelper
     {
         Task<AnalysisResponse> Analyse(string analysisRequest);
-
         Task<AnalysisResponse> AnalyseForMetrics(string analysisRequest);
+        Task<AnalysisResponse> PublishModel(string modelId);
+        Task<List<Model>> GetModels();
+        Task<bool> TrainModel();
+        Task<string> AddIntent(string intentName);
+        Task DeleteIntent(string intentId);
+        Task AddQuestions(string intentId, Question[] questions);
     }
 }
